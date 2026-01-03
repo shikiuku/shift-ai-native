@@ -29,5 +29,6 @@ AIを活用した、店舗や職場向けの高度なシフト管理・自動生
 ## 4. 技術スタック (Tech Stack)
 - **Framework**: Expo (React Native)
 - **Language**: TypeScript
+- **Repository**: [shikiuku/shift-ai-native](https://github.com/shikiuku/shift-ai-native)
 - **UI/Icons**: Lucide React Native
 - **Styling**: React Native StyleSheet (モバイル最適化)
