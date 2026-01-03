@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Switch } from 'react-native';
-import { Copy } from 'lucide-react-native';
+import { Copy, Plus } from 'lucide-react-native';
 import { スタッフ勤務設定, 時間範囲 } from '../../../logic/types';
 import TimeInputGroup from '../../StoreSettings/components/TimeInputGroup';
 
@@ -9,10 +9,19 @@ interface Props {
     schedule: スタッフ勤務設定[];
     onToggle: (index: number) => void;
     onUpdateRange: (dayIdx: number, rangeIdx: number, key: keyof 時間範囲, val: string) => void;
+    onAddSlot: (dayIdx: number) => void;
+    onDeleteSlot: (dayIdx: number, rangeIdx: number) => void;
     onApplyToAll: (dayIdx: number) => void;
 }
 
-const StaffScheduleGrid: React.FC<Props> = ({ schedule, onToggle, onUpdateRange, onApplyToAll }) => {
+const StaffScheduleGrid: React.FC<Props> = ({
+    schedule,
+    onToggle,
+    onUpdateRange,
+    onAddSlot,
+    onDeleteSlot,
+    onApplyToAll
+}) => {
     return (
         <View style={styles.container}>
             {schedule.map((config, cIdx) => (
@@ -29,24 +38,35 @@ const StaffScheduleGrid: React.FC<Props> = ({ schedule, onToggle, onUpdateRange,
                             />
                         </View>
                         {config.出勤可能 && (
-                            <TouchableOpacity style={styles.copyBtn} onPress={() => onApplyToAll(cIdx)}>
-                                <Copy size={14} color="#2d5a27" />
-                                <Text style={styles.copyText}>全曜日に適用</Text>
-                            </TouchableOpacity>
+                            <View style={styles.headerBtns}>
+                                <TouchableOpacity style={styles.copyBtn} onPress={() => onApplyToAll(cIdx)}>
+                                    <Copy size={12} color="#2d5a27" />
+                                    <Text style={styles.btnText}>全曜日に適用</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.addBtn} onPress={() => onAddSlot(cIdx)}>
+                                    <Plus size={14} color="#2d5a27" />
+                                    <Text style={styles.btnText}>追加</Text>
+                                </TouchableOpacity>
+                            </View>
                         )}
                     </View>
 
-                    {config.出勤可能 && config.可能時間帯.map((range, rIdx) => (
-                        <View key={rIdx} style={styles.timeArea}>
-                            <TimeInputGroup
-                                startTime={range.開始}
-                                endTime={range.終了}
-                                onStartTimeChange={(val) => onUpdateRange(cIdx, rIdx, '開始', val)}
-                                onEndTimeChange={(val) => onUpdateRange(cIdx, rIdx, '終了', val)}
-                                showDelete={false}
-                            />
+                    {config.出勤可能 && (
+                        <View style={styles.slotsList}>
+                            {config.可能時間帯.map((range, rIdx) => (
+                                <View key={rIdx} style={styles.timeArea}>
+                                    <TimeInputGroup
+                                        startTime={range.開始}
+                                        endTime={range.終了}
+                                        onStartTimeChange={(val) => onUpdateRange(cIdx, rIdx, '開始', val)}
+                                        onEndTimeChange={(val) => onUpdateRange(cIdx, rIdx, '終了', val)}
+                                        showDelete={config.可能時間帯.length > 1}
+                                        onDelete={() => onDeleteSlot(cIdx, rIdx)}
+                                    />
+                                </View>
+                            ))}
                         </View>
-                    ))}
+                    )}
 
                     {!config.出勤可能 && (
                         <Text style={styles.offText}>この曜日はお休みです</Text>
@@ -87,24 +107,40 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'bold',
         color: '#1e293b',
-        width: 60,
+        width: 50,
+    },
+    headerBtns: {
+        flexDirection: 'row',
+        gap: 6,
     },
     copyBtn: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 4,
         backgroundColor: '#e8f5e9',
-        paddingHorizontal: 8,
+        paddingHorizontal: 6,
         paddingVertical: 4,
-        borderRadius: 8,
+        borderRadius: 6,
     },
-    copyText: {
-        fontSize: 10,
+    addBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        backgroundColor: '#f0f4f0',
+        paddingHorizontal: 6,
+        paddingVertical: 4,
+        borderRadius: 6,
+    },
+    btnText: {
+        fontSize: 9,
         fontWeight: 'bold',
         color: '#2d5a27',
     },
+    slotsList: {
+        gap: 8,
+    },
     timeArea: {
-        marginTop: 4,
+        marginTop: 2,
     },
     offText: {
         fontSize: 11,

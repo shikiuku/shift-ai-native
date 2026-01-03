@@ -9,9 +9,11 @@ interface Props {
     staff: スタッフ;
     isExpanded: boolean;
     onToggleExpand: () => void;
-    onUpdateName: (name) => void;
+    onUpdateName: (name: string) => void;
     onToggleDay: (dayIdx: number) => void;
     onUpdateRange: (dayIdx: number, rangeIdx: number, key: keyof 時間範囲, val: string) => void;
+    onAddSlot: (dayIdx: number) => void;
+    onDeleteSlot: (dayIdx: number, rangeIdx: number) => void;
     onApplyToAll: (dayIdx: number) => void;
     onDelete: () => void;
 }
@@ -23,6 +25,8 @@ const StaffCard: React.FC<Props> = ({
     onUpdateName,
     onToggleDay,
     onUpdateRange,
+    onAddSlot,
+    onDeleteSlot,
     onApplyToAll,
     onDelete,
 }) => {
@@ -60,6 +64,8 @@ const StaffCard: React.FC<Props> = ({
                         schedule={staff.勤務設定}
                         onToggle={onToggleDay}
                         onUpdateRange={onUpdateRange}
+                        onAddSlot={onAddSlot}
+                        onDeleteSlot={onDeleteSlot}
                         onApplyToAll={onApplyToAll}
                     />
 

@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { UserPlus } from 'lucide-react-native';
-import { スタッフ, 時間範囲 } from '../../logic/types';
+import { スタッフ } from '../../logic/types';
 import StaffCard from './components/StaffCard';
 
 interface Props {
@@ -59,6 +59,33 @@ const StaffList: React.FC<Props> = ({
                                     ...range新[rangeIdx],
                                     [key]: val === '' ? 0 : parseInt(val) || 0
                                 };
+                                新[dayIdx] = { ...新[dayIdx], 可能時間帯: range新 };
+                                return { ...st, 勤務設定: 新 };
+                            });
+                        }}
+                        onAddSlot={(dayIdx) => {
+                            updateStaff(s.id, st => {
+                                const 新 = [...st.勤務設定];
+                                const lastSlot = 新[dayIdx].可能時間帯[新[dayIdx].可能時間帯.length - 1];
+                                新[dayIdx] = {
+                                    ...新[dayIdx],
+                                    可能時間帯: [
+                                        ...新[dayIdx].可能時間帯,
+                                        {
+                                            開始: lastSlot ? lastSlot.終了 : 9,
+                                            終了: lastSlot ? lastSlot.終了 + 4 : 18,
+                                            最小人数: 0,
+                                            最大人数: 0
+                                        }
+                                    ]
+                                };
+                                return { ...st, 勤務設定: 新 };
+                            });
+                        }}
+                        onDeleteSlot={(dayIdx, rangeIdx) => {
+                            updateStaff(s.id, st => {
+                                const 新 = [...st.勤務設定];
+                                const range新 = 新[dayIdx].可能時間帯.filter((_, i) => i !== rangeIdx);
                                 新[dayIdx] = { ...新[dayIdx], 可能時間帯: range新 };
                                 return { ...st, 勤務設定: 新 };
                             });
