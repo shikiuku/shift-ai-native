@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Plus } from 'lucide-react-native';
+import { Plus, CheckCheck } from 'lucide-react-native';
 import { 曜日設定, 時間範囲 } from '../../../logic/types';
 import TimeInputGroup from './TimeInputGroup';
 import CountInputGroup from './CountInputGroup';
@@ -9,9 +9,10 @@ import CountInputGroup from './CountInputGroup';
 interface Props {
     setting: 曜日設定;
     onUpdate: (newSetting: 曜日設定) => void;
+    onApplyToAll: () => void;
 }
 
-const DaySettingRow: React.FC<Props> = ({ setting, onUpdate }) => {
+const DaySettingRow: React.FC<Props> = ({ setting, onUpdate, onApplyToAll }) => {
     const updateSlot = (sIdx: number, key: keyof 時間範囲, val: string) => {
         const newSetting = { ...setting };
         const slots = [...newSetting.営業時間帯];
@@ -48,10 +49,16 @@ const DaySettingRow: React.FC<Props> = ({ setting, onUpdate }) => {
         <View style={styles.row}>
             <View style={styles.rowHeader}>
                 <Text style={styles.dayLabel}>{setting.曜日}</Text>
-                <TouchableOpacity onPress={addSlot} style={styles.addSlotBtn}>
-                    <Plus size={16} color="#2d5a27" />
-                    <Text style={styles.addSlotText}>時間帯追加</Text>
-                </TouchableOpacity>
+                <View style={styles.headerBtns}>
+                    <TouchableOpacity onPress={onApplyToAll} style={styles.applyAllBtn}>
+                        <CheckCheck size={14} color="#2d5a27" />
+                        <Text style={styles.applyAllText}>全曜日に適用</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={addSlot} style={styles.addSlotBtn}>
+                        <Plus size={16} color="#2d5a27" />
+                        <Text style={styles.addSlotText}>時間帯追加</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <View style={styles.slotsContainer}>
@@ -94,6 +101,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 4,
+        flexWrap: 'wrap',
+        gap: 8,
+    },
+    headerBtns: {
+        flexDirection: 'row',
+        gap: 8,
     },
     dayLabel: {
         fontSize: 16,
@@ -111,6 +124,22 @@ const styles = StyleSheet.create({
     },
     addSlotText: {
         fontSize: 12,
+        fontWeight: 'bold',
+        color: '#2d5a27',
+    },
+    applyAllBtn: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        backgroundColor: '#e8f5e9',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#c8e6c9',
+    },
+    applyAllText: {
+        fontSize: 10,
         fontWeight: 'bold',
         color: '#2d5a27',
     },
