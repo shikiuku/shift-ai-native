@@ -2,7 +2,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
 import { UserPlus, ChevronRight, ChevronDown, Trash2 } from 'lucide-react-native';
-import { スタッフ, 役割, 曜日一覧 } from '../logic/types';
+import { スタッフ, 役割, 曜日一覧 } from '../../logic/types';
+
+interface Props {
+    全スタッフ: スタッフ[];
+    set全スタッフ: (s: スタッフ[]) => void;
+    展開中のスタッフID: string | null;
+    set展開中のスタッフID: (id: string | null) => void;
+    スタッフ追加: () => void;
+}
+
+import StaffCard from './components/StaffCard';
 
 interface Props {
     全スタッフ: スタッフ[];
@@ -30,71 +40,26 @@ const StaffList: React.FC<Props> = ({
             </View>
 
             <ScrollView contentContainerStyle={styles.list}>
-                {全スタッフ.map(s => {
-                    const isExpanded = 展開中のスタッフID === s.id;
-                    return (
-                        <View key={s.id} style={[styles.card, isExpanded && styles.cardExpanded]}>
-                            <TouchableOpacity
-                                style={styles.cardHeader}
-                                onPress={() => set展開中のスタッフID(isExpanded ? null : s.id)}
-                            >
-                                <View style={styles.userInfo}>
-                                    <View style={[styles.avatar, { backgroundColor: s.色 }]}>
-                                        <Text style={styles.avatarText}>{s.名前[0]}</Text>
-                                    </View>
-                                    <View>
-                                        <Text style={styles.userName}>{s.名前}</Text>
-                                        <Text style={styles.userRole}>{s.役割}</Text>
-                                    </View>
-                                </View>
-                                {isExpanded ? <ChevronDown size={20} color="#cbd5e1" /> : <ChevronRight size={20} color="#cbd5e1" />}
-                            </TouchableOpacity>
-
-                            {isExpanded && (
-                                <View style={styles.details}>
-                                    <View style={styles.inputGroup}>
-                                        <Text style={styles.label}>名前</Text>
-                                        <TextInput
-                                            style={styles.input}
-                                            value={s.名前}
-                                            onChangeText={val => set全スタッフ(全スタッフ.map(st => st.id === s.id ? { ...st, 名前: val } : st))}
-                                        />
-                                    </View>
-
-                                    <Text style={styles.subTitle}>週間出勤設定</Text>
-                                    <View style={styles.scheduleGrid}>
-                                        {s.勤務設定.map((config, cIdx) => (
-                                            <View key={config.曜日} style={styles.scheduleRow}>
-                                                <Text style={styles.dayText}>{config.曜日.slice(0, 1)}</Text>
-                                                <TouchableOpacity
-                                                    style={[styles.toggle, config.出勤可能 ? styles.toggleOn : styles.toggleOff]}
-                                                    onPress={() => {
-                                                        const 新 = [...全スタッフ];
-                                                        const stIdx = 新.findIndex(st => st.id === s.id);
-                                                        新[stIdx].勤務設定[cIdx].出勤可能 = !新[stIdx].勤務設定[cIdx].出勤可能;
-                                                        set全スタッフ(新);
-                                                    }}
-                                                >
-                                                    <Text style={[styles.toggleText, config.出勤可能 && styles.toggleTextOn]}>
-                                                        {config.出勤可能 ? '可' : '不可'}
-                                                    </Text>
-                                                </TouchableOpacity>
-                                            </View>
-                                        ))}
-                                    </View>
-
-                                    <TouchableOpacity
-                                        style={styles.deleteButton}
-                                        onPress={() => set全スタッフ(全スタッフ.filter(item => item.id !== s.id))}
-                                    >
-                                        <Trash2 size={16} color="#f87171" />
-                                        <Text style={styles.deleteButtonText}>削除</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            )}
-                        </View>
-                    );
-                })}
+                {全スタッフ.map(s => (
+                    <StaffCard
+                        key={s.id}
+                        staff={s}
+                        isExpanded={展開中のスタッフID === s.id}
+                        onToggleExpand={() => set展開中のスタッフID(展開中のスタッフID === s.id ? null : s.id)}
+                        onUpdateName={(name) => {
+                            set全スタッフ(全スタッフ.map(st => st.id === s.id ? { ...st, 名前: name } : st));
+                        }}
+                        onToggleDay={(dayIdx) => {
+                            const 新 = [...全スタッフ];
+                            const stIdx = 新.findIndex(st => st.id === s.id);
+                            新[stIdx].勤務設定[dayIdx].出勤可能 = !新[stIdx].勤務設定[dayIdx].出勤可能;
+                            set全スタッフ(新);
+                        }}
+                        onDelete={() => {
+                            set全スタッフ(全スタッフ.filter(item => item.id !== s.id));
+                        }}
+                    />
+                ))}
             </ScrollView>
         </View>
     );

@@ -22,10 +22,10 @@ import {
 import { 自動シフト生成 } from './src/logic/services/shiftLogic';
 
 // 画面のインポート
-import StoreSettings from './src/screens/StoreSettings';
-import StaffList from './src/screens/StaffList';
-import Rules from './src/screens/Rules';
-import ShiftTable from './src/screens/ShiftTable';
+import StoreSettings from './src/screens/StoreSettings/StoreSettings';
+import StaffList from './src/screens/StaffList/StaffList';
+import Rules from './src/screens/Rules/Rules';
+import ShiftTable from './src/screens/ShiftTable/ShiftTable';
 
 const App: React.FC = () => {
   const [全スタッフ, set全スタッフ] = useState<スタッフ[]>([]);

@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { CalendarDays, Users2, Printer } from 'lucide-react-native';
-import { 週間スケジュール, スタッフ, 曜日一覧, 時間ラベル } from '../logic/types';
+import { 週間スケジュール, スタッフ, 曜日一覧, 時間ラベル } from '../../logic/types';
 
 interface Props {
     スケジュール: 週間スケジュール | null;

@@ -2,7 +2,15 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { ArrowRightLeft, Plus, Trash2 } from 'lucide-react-native';
-import { 相性ルール, スタッフ } from '../logic/types';
+import { 相性ルール, スタッフ } from '../../logic/types';
+
+interface Props {
+    全スタッフ: スタッフ[];
+    全ルール: 相性ルール[];
+    set全ルール: (r: 相性ルール[]) => void;
+}
+
+import RuleItem from './components/RuleItem';
 
 interface Props {
     全スタッフ: スタッフ[];
@@ -32,42 +40,20 @@ const Rules: React.FC<Props> = ({ 全スタッフ, 全ルール, set全ルール
             </View>
 
             <ScrollView contentContainerStyle={styles.list}>
-                {全ルール.map((r, idx) => {
-                    const s1 = 全スタッフ.find(s => s.id === r.スタッフID1);
-                    const s2 = 全スタッフ.find(s => s.id === r.スタッフID2);
-
-                    return (
-                        <View key={idx} style={styles.card}>
-                            <View style={styles.ruleDetail}>
-                                <View style={styles.participant}>
-                                    <Text style={styles.participantName}>{s1?.名前 || '不明'}</Text>
-                                </View>
-                                <TouchableOpacity
-                                    style={[styles.typeBadge, r.タイプ === '一緒にしない' ? styles.typeBad : styles.typeGood]}
-                                    onPress={() => {
-                                        const 新 = [...全ルール];
-                                        新[idx].タイプ = r.タイプ === '一緒にする' ? '一緒にしない' : '一緒にする';
-                                        set全ルール(新);
-                                    }}
-                                >
-                                    <ArrowRightLeft size={16} color={r.タイプ === '一緒にしない' ? '#f87171' : '#4ade80'} />
-                                    <Text style={[styles.typeText, r.タイプ === '一緒にしない' ? styles.typeTextBad : styles.typeTextGood]}>
-                                        {r.タイプ}
-                                    </Text>
-                                </TouchableOpacity>
-                                <View style={styles.participant}>
-                                    <Text style={styles.participantName}>{s2?.名前 || '不明'}</Text>
-                                </View>
-                            </View>
-                            <TouchableOpacity
-                                style={styles.deleteButton}
-                                onPress={() => set全ルール(全ルール.filter((_, i) => i !== idx))}
-                            >
-                                <Trash2 size={16} color="#cbd5e1" />
-                            </TouchableOpacity>
-                        </View>
-                    );
-                })}
+                {全ルール.map((r, idx) => (
+                    <RuleItem
+                        key={idx}
+                        rule={r}
+                        staff1={全スタッフ.find(s => s.id === r.スタッフID1)}
+                        staff2={全スタッフ.find(s => s.id === r.スタッフID2)}
+                        onToggleType={() => {
+                            const 新 = [...全ルール];
+                            新[idx].タイプ = r.タイプ === '一緒にする' ? '一緒にしない' : '一緒にする';
+                            set全ルール(新);
+                        }}
+                        onDelete={() => set全ルール(全ルール.filter((_, i) => i !== idx))}
+                    />
+                ))}
 
                 {全ルール.length === 0 && (
                     <View style={styles.emptyState}>

@@ -12,13 +12,32 @@ AIを活用した、店舗や職場向けの高度なシフト管理・自動生
 - **スタッフ管理**: モバイルに最適化されたリスト表示とスムーズな詳細設定。
 - **シフト表**: 縦横のスクロールに対応し、小さな画面でも情報の視認性を確保。
 
-## 2. プロジェクト構造 (Project Structure)
-- `App.tsx`: エントリポイントおよびナビゲーション管理。
-- `src/components/`: 再利用可能なUIコンポーネント。
-- `src/screens/`: 各画面（店舗設定、スタッフ、ルール、シフト表）。
-- `src/logic/`: AI（自動生成）の中核ロジック（移植予定）。
-- `app.json`: Expo 設定ファイル。
-- `project_ai_rules.md`: AI開発ルール。
+## 2. ディレクトリ構造 (Project Structure)
+```text
+シフトai/
+├── App.tsx             # メインエントリ・状態管理・ナビゲーション
+├── app.json            # Expo 設定
+├── package.json        # 依存関係
+├── src/
+│   ├── logic/          # ビジネスロジック
+│   │   ├── types.ts    # 型定義
+│   │   └── services/   # AI生成アルゴリズム等
+│   ├── screens/        # 各画面（フォルダごとに構成要素を分離）
+│   │   ├── StoreSettings/
+│   │   │   ├── StoreSettings.tsx
+│   │   │   └── components/
+│   │   ├── StaffList/
+│   │   │   ├── StaffList.tsx
+│   │   │   └── components/
+│   │   ├── Rules/
+│   │   │   ├── Rules.tsx
+│   │   │   └── components/
+│   │   └── ShiftTable/
+│   │       ├── ShiftTable.tsx
+│   │       └── components/
+│   └── components/     # 全体共通コンポーネント
+└── assets/             # 画像・アイコン等の静的ファイル
+```
 
 ## 3. 進捗状況 (Progress)
 - [x] Web版（Vite）からの移行決定。
