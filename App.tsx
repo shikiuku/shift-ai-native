@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import {
   Store,
@@ -28,13 +27,15 @@ import Rules from './src/screens/Rules/Rules';
 import ShiftTable from './src/screens/ShiftTable/ShiftTable';
 
 const App: React.FC = () => {
+  const { width } = useWindowDimensions();
+  const isTablet = width >= 768;
+
   const [全スタッフ, set全スタッフ] = useState<スタッフ[]>([]);
   const [全ルール, set全ルール] = useState<相性ルール[]>([]);
   const [スケジュール, setスケジュール] = useState<週間スケジュール | null>(null);
   const [店舗スケジュール, set店舗スケジュール] = useState<曜日設定[]>([]);
   const [activeTab, setActiveTab] = useState<'Store' | 'Staff' | 'Rules' | 'Shift'>('Store');
   const [展開中のスタッフID, set展開中のスタッフID] = useState<string | null>(null);
-  const [isTablet, setIsTablet] = useState(Dimensions.get('window').width >= 768);
 
   // 初期データ構築
   useEffect(() => {
@@ -60,12 +61,6 @@ const App: React.FC = () => {
       }))
     }));
     set全スタッフ(初期スタッフ);
-  }, []);
-
-  useEffect(() => {
-    const updateLayout = () => setIsTablet(Dimensions.get('window').width >= 768);
-    const subscription = Dimensions.addEventListener('change', updateLayout);
-    return () => subscription?.remove();
   }, []);
 
   const スタッフ追加 = () => {
@@ -120,28 +115,38 @@ const App: React.FC = () => {
 
   const NavButton = ({ id, icon: Icon, label }: { id: typeof activeTab, icon: any, label: string }) => (
     <TouchableOpacity
-      style={[styles.navButton, activeTab === id && styles.navButtonActive]}
+      style={[
+        styles.navButton,
+        activeTab === id && styles.navButtonActive,
+        !isTablet && styles.mobileNavButton
+      ]}
       onPress={() => setActiveTab(id)}
     >
-      <Icon size={24} color={activeTab === id ? '#2d5a27' : '#a5d6a7'} />
-      <Text style={[styles.navLabel, activeTab === id && styles.navLabelActive]}>{label}</Text>
+      <Icon size={isTablet ? 24 : 20} color={activeTab === id ? '#2d5a27' : '#a5d6a7'} />
+      <Text style={[
+        styles.navLabel,
+        activeTab === id && styles.navLabelActive,
+        !isTablet && styles.mobileNavLabel
+      ]}>{label}</Text>
     </TouchableOpacity>
   );
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.headerLogo}>
-            <View style={styles.logoIcon}>
-              <Flower size={20} color="#2d5a27" />
+      <View style={styles.container}>
+        <SafeAreaView style={styles.headerSafeArea}>
+          <View style={styles.header}>
+            <View style={styles.headerLogo}>
+              <View style={styles.logoIcon}>
+                <Flower size={20} color="#2d5a27" />
+              </View>
+              <Text style={styles.headerTitle}>シフトAI</Text>
             </View>
-            <Text style={styles.headerTitle}>シフトAI</Text>
+            <TouchableOpacity style={styles.generateButton} onPress={シフト生成実行}>
+              <Text style={styles.generateButtonText}>AI生成</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.generateButton} onPress={シフト生成実行}>
-            <Text style={styles.generateButtonText}>AI生成</Text>
-          </TouchableOpacity>
-        </View>
+        </SafeAreaView>
 
         <View style={styles.mainLayout}>
           {isTablet && (
@@ -159,14 +164,16 @@ const App: React.FC = () => {
         </View>
 
         {!isTablet && (
-          <View style={styles.bottomTab}>
-            <NavButton id="Store" icon={Store} label="設定" />
-            <NavButton id="Staff" icon={Users} label="名簿" />
-            <NavButton id="Rules" icon={ArrowRightLeft} label="相性" />
-            <NavButton id="Shift" icon={CalendarDays} label="表" />
-          </View>
+          <SafeAreaView style={styles.bottomTabSafeArea}>
+            <View style={styles.bottomTab}>
+              <NavButton id="Store" icon={Store} label="設定" />
+              <NavButton id="Staff" icon={Users} label="名簿" />
+              <NavButton id="Rules" icon={ArrowRightLeft} label="相性" />
+              <NavButton id="Shift" icon={CalendarDays} label="表" />
+            </View>
+          </SafeAreaView>
         )}
-      </SafeAreaView>
+      </View>
     </SafeAreaProvider>
   );
 };
@@ -175,6 +182,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f0f4f0',
+  },
+  headerSafeArea: {
+    backgroundColor: '#2d5a27',
   },
   header: {
     height: 60,
@@ -225,13 +235,15 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  bottomTabSafeArea: {
+    backgroundColor: '#1b3a17',
+  },
   bottomTab: {
-    height: 70,
+    height: 60,
     backgroundColor: '#1b3a17',
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingBottom: 10,
   },
   navButton: {
     alignItems: 'center',
@@ -240,6 +252,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     minWidth: 60,
   },
+  mobileNavButton: {
+    paddingVertical: 6,
+    minWidth: 70,
+  },
   navButtonActive: {
     backgroundColor: '#cddc39',
   },
@@ -247,6 +263,9 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#a5d6a7',
     fontWeight: 'bold',
+  },
+  mobileNavLabel: {
+    fontSize: 9,
   },
   navLabelActive: {
     color: '#2d5a27',
