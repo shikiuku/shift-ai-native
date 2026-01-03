@@ -15,28 +15,39 @@ AIを活用した、店舗や職場向けの高度なシフト管理・自動生
 ## 2. ディレクトリ構造 (Project Structure)
 ```text
 シフトai/
-├── App.tsx             # メインエントリ・状態管理・ナビゲーション
-├── app.json            # Expo 設定
-├── package.json        # 依存関係
+├── App.tsx             # メインエントリ・レイアウト切替
+├── app.json            # Expo 設定 (iOS BundleID等含む)
+├── index.ts            # エントリポイント
 ├── src/
-│   ├── logic/          # ビジネスロジック
-│   │   ├── types.ts    # 型定義
-│   │   └── services/   # AI生成アルゴリズム等
-│   ├── screens/        # 各画面（フォルダごとに構成要素を分離）
-│   │   ├── StoreSettings/
+│   ├── logic/          # ロジック層
+│   │   ├── types.ts    # 主要な型定義
+│   │   └── services/   
+│   │       ├── shiftLogic.ts    # AI自動生成アルゴリズム
+│   │       └── geminiService.ts # 将来的なAI連携用
+│   ├── screens/        # 各画面
+│   │   ├── StoreSettings/ # 店舗・営業時間設定
 │   │   │   ├── StoreSettings.tsx
 │   │   │   └── components/
-│   │   ├── StaffList/
+│   │   │       ├── DaySettingRow.tsx  # 曜日別設定行
+│   │   │       ├── TimeRangeBar.tsx   # インタラクティブ・タイムバー
+│   │   │       ├── TimeInputGroup.tsx # 数値入力
+│   │   │       └── CountInputGroup.tsx
+│   │   ├── StaffList/     # スタッフ名簿・希望設定
 │   │   │   ├── StaffList.tsx
 │   │   │   └── components/
-│   │   ├── Rules/
+│   │   │       ├── StaffCard.tsx
+│   │   │       └── StaffScheduleGrid.tsx # スタッフ版タイムバー
+│   │   ├── Rules/         # 相性ルール設定
 │   │   │   ├── Rules.tsx
 │   │   │   └── components/
-│   │   └── ShiftTable/
+│   │   │       └── RuleItem.tsx
+│   │   └── ShiftTable/    # 生成済みシフト表示
 │   │       ├── ShiftTable.tsx
 │   │       └── components/
-│   └── components/     # 全体共通コンポーネント
-└── assets/             # 画像・アイコン等の静的ファイル
+│   │           ├── ShiftHeader.tsx
+│   │           └── ShiftRow.tsx
+│   └── components/     # 共通コンポーネント
+└── assets/             # アイコン等の静的アセット
 ```
 
 ## 3. 進捗状況 (Progress)
