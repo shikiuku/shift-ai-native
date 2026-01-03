@@ -12,8 +12,14 @@ interface Props {
 
 const TimeRangeBar: React.FC<Props> = ({ slots, onUpdate, color = '#43a047', inactive = false }) => {
     const [containerWidth, setContainerWidth] = useState(0);
-    const activeSlotIdx = useRef<number | null>(null);
-    const activeHandle = useRef<'start' | 'end' | 'move' | null>(null);
+
+    // ジェスチャー開始時の値を保持するRef
+    const gestureStateRef = useRef<{
+        idx: number;
+        type: 'start' | 'end' | 'move';
+        initialStart: number;
+        initialEnd: number;
+    } | null>(null);
 
     const getPosition = (time: number) => {
         return `${(time / 24) * 100}%`;
@@ -27,42 +33,49 @@ const TimeRangeBar: React.FC<Props> = ({ slots, onUpdate, color = '#43a047', ina
         setContainerWidth(event.nativeEvent.layout.width);
     };
 
-    // 汎用的なPanResponderの作成
     const createPanResponder = (index: number, type: 'start' | 'end' | 'move') => {
         return PanResponder.create({
             onStartShouldSetPanResponder: () => !inactive && !!onUpdate,
             onPanResponderGrant: () => {
-                activeSlotIdx.current = index;
-                activeHandle.current = type;
+                gestureStateRef.current = {
+                    idx: index,
+                    type,
+                    initialStart: slots[index].開始,
+                    initialEnd: slots[index].終了,
+                };
             },
             onPanResponderMove: (_, gestureState) => {
-                if (inactive || !onUpdate || containerWidth === 0 || activeSlotIdx.current === null) return;
+                if (inactive || !onUpdate || containerWidth === 0 || !gestureStateRef.current) return;
 
+                const { idx, initialStart, initialEnd } = gestureStateRef.current;
                 const deltaX = gestureState.dx;
                 const deltaTime = (deltaX / containerWidth) * 24;
 
                 const newSlots = [...slots];
-                const slot = { ...newSlots[activeSlotIdx.current] };
+                const slot = { ...newSlots[idx] };
 
-                if (activeHandle.current === 'start') {
-                    let newStart = Math.round(slot.開始 + deltaTime);
-                    newStart = Math.max(0, Math.min(slot.終了 - 1, newStart));
+                if (type === 'start') {
+                    // 開始時間のみ変更
+                    let newStart = Math.round(initialStart + deltaTime);
+                    newStart = Math.max(0, Math.min(initialEnd - 1, newStart));
                     if (newStart !== slot.開始) {
                         slot.開始 = newStart;
-                        newSlots[activeSlotIdx.current] = slot;
+                        newSlots[idx] = slot;
                         onUpdate(newSlots);
                     }
-                } else if (activeHandle.current === 'end') {
-                    let newEnd = Math.round(slot.終了 + deltaTime);
-                    newEnd = Math.max(slot.開始 + 1, Math.min(24, newEnd));
+                } else if (type === 'end') {
+                    // 終了時間のみ変更
+                    let newEnd = Math.round(initialEnd + deltaTime);
+                    newEnd = Math.max(initialStart + 1, Math.min(24, newEnd));
                     if (newEnd !== slot.終了) {
                         slot.終了 = newEnd;
-                        newSlots[activeSlotIdx.current] = slot;
+                        newSlots[idx] = slot;
                         onUpdate(newSlots);
                     }
-                } else if (activeHandle.current === 'move') {
-                    let newStart = Math.round(slot.開始 + deltaTime);
-                    let newEnd = Math.round(slot.終了 + deltaTime);
+                } else if (type === 'move') {
+                    // バー全体を移動
+                    let newStart = Math.round(initialStart + deltaTime);
+                    let newEnd = Math.round(initialEnd + deltaTime);
 
                     if (newStart < 0) {
                         newEnd -= newStart;
@@ -76,21 +89,24 @@ const TimeRangeBar: React.FC<Props> = ({ slots, onUpdate, color = '#43a047', ina
                     if (newStart !== slot.開始 || newEnd !== slot.終了) {
                         slot.開始 = newStart;
                         slot.終了 = newEnd;
-                        newSlots[activeSlotIdx.current] = slot;
+                        newSlots[idx] = slot;
                         onUpdate(newSlots);
                     }
                 }
             },
             onPanResponderRelease: () => {
-                activeSlotIdx.current = null;
-                activeHandle.current = null;
+                gestureStateRef.current = null;
             },
+            onPanResponderTerminate: () => {
+                gestureStateRef.current = null;
+            }
         });
     };
 
     return (
         <View style={styles.container} onLayout={onLayout}>
             <View style={styles.track}>
+                {/* 目盛りガイド */}
                 <View style={styles.guideRow}>
                     {[0, 6, 12, 18, 24].map(h => (
                         <View key={h} style={[styles.tick, { left: `${(h / 24) * 100}%` }]} />
@@ -109,26 +125,26 @@ const TimeRangeBar: React.FC<Props> = ({ slots, onUpdate, color = '#43a047', ina
                                 { left: getPosition(start), width: getWidth(start, end) }
                             ]}
                         >
-                            {/* メインのバー（移動用） */}
+                            {/* 移動用メインエリア */}
                             <View
                                 style={[styles.slotBar, { backgroundColor: color }]}
                                 {...createPanResponder(index, 'move').panHandlers}
                             />
 
-                            {/* 左ハンドル（開始時間変更用） */}
+                            {/* 左ハンドル（開始時間用）: タッチ範囲を広げる */}
                             <View
-                                style={styles.handle}
+                                style={styles.handleContainer}
                                 {...createPanResponder(index, 'start').panHandlers}
                             >
-                                <View style={styles.handleDot} />
+                                <View style={[styles.handle, { borderColor: color }]} />
                             </View>
 
-                            {/* 右ハンドル（終了時間変更用） */}
+                            {/* 右ハンドル（終了時間用） */}
                             <View
-                                style={[styles.handle, styles.handleRight]}
+                                style={[styles.handleContainer, styles.handleRight]}
                                 {...createPanResponder(index, 'end').panHandlers}
                             >
-                                <View style={styles.handleDot} />
+                                <View style={[styles.handle, { borderColor: color }]} />
                             </View>
                         </View>
                     );
@@ -136,7 +152,7 @@ const TimeRangeBar: React.FC<Props> = ({ slots, onUpdate, color = '#43a047', ina
             </View>
 
             <View style={styles.labelRow}>
-                {[0, 6, 12, 18, 24].map(h => (
+                {[0, 4, 8, 12, 16, 20, 24].map(h => (
                     <Text key={h} style={styles.tickLabel}>{h}</Text>
                 ))}
             </View>
@@ -146,15 +162,15 @@ const TimeRangeBar: React.FC<Props> = ({ slots, onUpdate, color = '#43a047', ina
 
 const styles = StyleSheet.create({
     container: {
-        paddingVertical: 12,
+        paddingVertical: 14,
         width: '100%',
     },
     track: {
-        height: 16,
+        height: 18,
         backgroundColor: '#f1f5f9',
-        borderRadius: 8,
+        borderRadius: 9,
         position: 'relative',
-        overflow: 'visible', // ハンドルをはみ出させるため
+        overflow: 'visible',
         borderWidth: 1,
         borderColor: '#e2e8f0',
     },
@@ -181,44 +197,43 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgba(0,0,0,0.1)',
     },
-    handle: {
+    handleContainer: {
         position: 'absolute',
-        left: -10,
-        top: -4,
-        width: 20,
-        height: 24,
+        left: -15, // タッチ範囲を広げる
+        top: -10,
+        width: 30, // 30pxのタッチ範囲
+        height: 38,
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 20,
+        zIndex: 30, // 最前面
     },
     handleRight: {
         left: undefined,
-        right: -10,
+        right: -15,
     },
-    handleDot: {
-        width: 10,
-        height: 10,
+    handle: {
+        width: 14,
+        height: 14,
         backgroundColor: '#fff',
-        borderRadius: 5,
-        borderWidth: 2,
-        borderColor: '#43a047',
+        borderRadius: 7,
+        borderWidth: 3,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 1,
-        elevation: 2,
+        shadowOpacity: 0.3,
+        shadowRadius: 2,
+        elevation: 3,
     },
     labelRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginTop: 6,
+        marginTop: 8,
         paddingHorizontal: 0,
     },
     tickLabel: {
         fontSize: 10,
         color: '#94a3b8',
         fontWeight: 'bold',
-        width: 20,
+        width: 25,
         textAlign: 'center',
     }
 });
