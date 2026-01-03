@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Plus, CheckCheck } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Switch } from 'react-native';
+import { Plus, Copy } from 'lucide-react-native';
 import { 曜日設定, 時間範囲 } from '../../../logic/types';
 import TimeInputGroup from './TimeInputGroup';
 import CountInputGroup from './CountInputGroup';
@@ -18,10 +18,14 @@ const DaySettingRow: React.FC<Props> = ({ setting, onUpdate, onApplyToAll }) => 
         const slots = [...newSetting.営業時間帯];
         slots[sIdx] = {
             ...slots[sIdx],
-            [key]: parseInt(val) || 0
+            [key]: val === '' ? 0 : parseInt(val) || 0
         };
         newSetting.営業時間帯 = slots;
         onUpdate(newSetting);
+    };
+
+    const toggleClosed = () => {
+        onUpdate({ ...setting, 定休日: !setting.定休日 });
     };
 
     const addSlot = () => {
@@ -46,42 +50,65 @@ const DaySettingRow: React.FC<Props> = ({ setting, onUpdate, onApplyToAll }) => 
     };
 
     return (
-        <View style={styles.row}>
+        <View style={[styles.row, setting.定休日 && styles.rowClosed]}>
             <View style={styles.rowHeader}>
-                <Text style={styles.dayLabel}>{setting.曜日}</Text>
-                <View style={styles.headerBtns}>
-                    <TouchableOpacity onPress={onApplyToAll} style={styles.applyAllBtn}>
-                        <CheckCheck size={14} color="#2d5a27" />
-                        <Text style={styles.applyAllText}>全曜日に適用</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={addSlot} style={styles.addSlotBtn}>
-                        <Plus size={16} color="#2d5a27" />
-                        <Text style={styles.addSlotText}>時間帯追加</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-
-            <View style={styles.slotsContainer}>
-                {setting.営業時間帯.map((slot, sIdx) => (
-                    <View key={sIdx} style={styles.slotBox}>
-                        <TimeInputGroup
-                            startTime={slot.開始}
-                            endTime={slot.終了}
-                            onStartTimeChange={(val) => updateSlot(sIdx, '開始', val)}
-                            onEndTimeChange={(val) => updateSlot(sIdx, '終了', val)}
-                            showDelete={setting.営業時間帯.length > 1}
-                            onDelete={() => deleteSlot(sIdx)}
-                        />
-
-                        <CountInputGroup
-                            minStaff={slot.最小人数}
-                            maxStaff={slot.最大人数}
-                            onMinChange={(val) => updateSlot(sIdx, '最小人数', val)}
-                            onMaxChange={(val) => updateSlot(sIdx, '最大人数', val)}
+                <View style={styles.titleArea}>
+                    <Text style={styles.dayLabel}>{setting.曜日}</Text>
+                    <View style={styles.statusArea}>
+                        <Text style={[styles.statusText, setting.定休日 && styles.statusTextClosed]}>
+                            {setting.定休日 ? '定休日' : '営業日'}
+                        </Text>
+                        <Switch
+                            value={!setting.定休日}
+                            onValueChange={toggleClosed}
+                            trackColor={{ false: '#cbd5e1', true: '#cddc39' }}
+                            thumbColor={!setting.定休日 ? '#2d5a27' : '#f4f3f4'}
+                            ios_backgroundColor="#cbd5e1"
                         />
                     </View>
-                ))}
+                </View>
+
+                {!setting.定休日 && (
+                    <View style={styles.headerBtns}>
+                        <TouchableOpacity onPress={onApplyToAll} style={styles.applyAllBtn}>
+                            <Copy size={14} color="#2d5a27" />
+                            <Text style={styles.applyAllText}>全曜日に適用</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={addSlot} style={styles.addSlotBtn}>
+                            <Plus size={16} color="#2d5a27" />
+                            <Text style={styles.addSlotText}>追加</Text>
+                        </TouchableOpacity>
+                    </View>
+                )}
             </View>
+
+            {!setting.定休日 ? (
+                <View style={styles.slotsContainer}>
+                    {setting.営業時間帯.map((slot, sIdx) => (
+                        <View key={sIdx} style={styles.slotBox}>
+                            <TimeInputGroup
+                                startTime={slot.開始}
+                                endTime={slot.終了}
+                                onStartTimeChange={(val) => updateSlot(sIdx, '開始', val)}
+                                onEndTimeChange={(val) => updateSlot(sIdx, '終了', val)}
+                                showDelete={setting.営業時間帯.length > 1}
+                                onDelete={() => deleteSlot(sIdx)}
+                            />
+
+                            <CountInputGroup
+                                minStaff={slot.最小人数}
+                                maxStaff={slot.最大人数}
+                                onMinChange={(val) => updateSlot(sIdx, '最小人数', val)}
+                                onMaxChange={(val) => updateSlot(sIdx, '最大人数', val)}
+                            />
+                        </View>
+                    ))}
+                </View>
+            ) : (
+                <View style={styles.closedInfo}>
+                    <Text style={styles.closedInfoText}>この曜日はシフトを生成しません</Text>
+                </View>
+            )}
         </View>
     );
 };
@@ -96,13 +123,40 @@ const styles = StyleSheet.create({
         gap: 12,
         marginBottom: 12,
     },
+    rowClosed: {
+        backgroundColor: '#f8fafc',
+        borderColor: '#f1f5f9',
+        opacity: 0.8,
+    },
     rowHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 4,
         flexWrap: 'wrap',
+        gap: 12,
+    },
+    titleArea: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+    },
+    statusArea: {
+        flexDirection: 'row',
+        alignItems: 'center',
         gap: 8,
+        backgroundColor: '#f8fafc',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 20,
+    },
+    statusText: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        color: '#2d5a27',
+    },
+    statusTextClosed: {
+        color: '#94a3b8',
     },
     headerBtns: {
         flexDirection: 'row',
@@ -151,6 +205,17 @@ const styles = StyleSheet.create({
         paddingTop: 8,
         borderTopWidth: 1,
         borderTopColor: '#f1f5f9',
+    },
+    closedInfo: {
+        padding: 12,
+        backgroundColor: '#f1f5f9',
+        borderRadius: 12,
+        alignItems: 'center',
+    },
+    closedInfoText: {
+        fontSize: 12,
+        color: '#64748b',
+        fontWeight: 'bold',
     }
 });
 
