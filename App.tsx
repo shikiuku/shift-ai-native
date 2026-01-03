@@ -122,7 +122,7 @@ const App: React.FC = () => {
       ]}
       onPress={() => setActiveTab(id)}
     >
-      <Icon size={isTablet ? 24 : 20} color={activeTab === id ? '#2e7d32' : '#a5d6a7'} />
+      <Icon size={isTablet ? 24 : 20} color={activeTab === id ? '#2e7d32' : '#94a3b8'} />
       <Text style={[
         styles.navLabel,
         activeTab === id && styles.navLabelActive,
@@ -181,10 +181,10 @@ const App: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f1f8e9', // Brighter minty bg
+    backgroundColor: '#fff',
   },
   headerSafeArea: {
-    backgroundColor: '#43a047', // Refreshing green
+    backgroundColor: '#43a047',
   },
   header: {
     height: 60,
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   logoIcon: {
-    backgroundColor: '#dce775', // Brighter lime
+    backgroundColor: '#dce775',
     padding: 4,
     borderRadius: 8,
   },
@@ -226,7 +226,9 @@ const styles = StyleSheet.create({
   },
   sidebar: {
     width: 80,
-    backgroundColor: '#2e7d32', // Lush Green
+    backgroundColor: '#f8fafc', // Light Grayish Blue
+    borderRightWidth: 1,
+    borderRightColor: '#e2e8f0',
     paddingVertical: 20,
     alignItems: 'center',
     gap: 20,
@@ -236,14 +238,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   bottomTabSafeArea: {
-    backgroundColor: '#2e7d32',
+    backgroundColor: '#f8fafc',
   },
   bottomTab: {
     height: 60,
-    backgroundColor: '#2e7d32',
+    backgroundColor: '#f8fafc',
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#e2e8f0',
   },
   navButton: {
     alignItems: 'center',
@@ -257,18 +261,18 @@ const styles = StyleSheet.create({
     minWidth: 70,
   },
   navButtonActive: {
-    backgroundColor: '#dce775',
+    backgroundColor: '#f1f8e9', // Very light green tint
   },
   navLabel: {
     fontSize: 10,
-    color: '#c8e6c9',
+    color: '#94a3b8',
     fontWeight: 'bold',
   },
   mobileNavLabel: {
     fontSize: 9,
   },
   navLabelActive: {
-    color: '#1b5e20', // Clear dark green for contrast
+    color: '#2e7d32',
   },
 });
 
