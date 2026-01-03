@@ -122,7 +122,7 @@ const App: React.FC = () => {
       ]}
       onPress={() => setActiveTab(id)}
     >
-      <Icon size={isTablet ? 24 : 20} color={activeTab === id ? '#2d5a27' : '#a5d6a7'} />
+      <Icon size={isTablet ? 24 : 20} color={activeTab === id ? '#2e7d32' : '#a5d6a7'} />
       <Text style={[
         styles.navLabel,
         activeTab === id && styles.navLabelActive,
@@ -138,7 +138,7 @@ const App: React.FC = () => {
           <View style={styles.header}>
             <View style={styles.headerLogo}>
               <View style={styles.logoIcon}>
-                <Flower size={20} color="#2d5a27" />
+                <Flower size={20} color="#2e7d32" />
               </View>
               <Text style={styles.headerTitle}>シフトAI</Text>
             </View>
@@ -181,14 +181,14 @@ const App: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f4f0',
+    backgroundColor: '#f1f8e9', // Brighter minty bg
   },
   headerSafeArea: {
-    backgroundColor: '#2d5a27',
+    backgroundColor: '#43a047', // Refreshing green
   },
   header: {
     height: 60,
-    backgroundColor: '#2d5a27',
+    backgroundColor: '#43a047',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   logoIcon: {
-    backgroundColor: '#cddc39',
+    backgroundColor: '#dce775', // Brighter lime
     padding: 4,
     borderRadius: 8,
   },
@@ -210,13 +210,13 @@ const styles = StyleSheet.create({
     fontWeight: '900',
   },
   generateButton: {
-    backgroundColor: '#cddc39',
+    backgroundColor: '#dce775',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 12,
   },
   generateButtonText: {
-    color: '#2d5a27',
+    color: '#2e7d32',
     fontWeight: '900',
     fontSize: 14,
   },
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   },
   sidebar: {
     width: 80,
-    backgroundColor: '#1b3a17',
+    backgroundColor: '#2e7d32', // Lush Green
     paddingVertical: 20,
     alignItems: 'center',
     gap: 20,
@@ -236,11 +236,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   bottomTabSafeArea: {
-    backgroundColor: '#1b3a17',
+    backgroundColor: '#2e7d32',
   },
   bottomTab: {
     height: 60,
-    backgroundColor: '#1b3a17',
+    backgroundColor: '#2e7d32',
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
@@ -257,18 +257,18 @@ const styles = StyleSheet.create({
     minWidth: 70,
   },
   navButtonActive: {
-    backgroundColor: '#cddc39',
+    backgroundColor: '#dce775',
   },
   navLabel: {
     fontSize: 10,
-    color: '#a5d6a7',
+    color: '#c8e6c9',
     fontWeight: 'bold',
   },
   mobileNavLabel: {
     fontSize: 9,
   },
   navLabelActive: {
-    color: '#2d5a27',
+    color: '#1b5e20', // Clear dark green for contrast
   },
 });
 
