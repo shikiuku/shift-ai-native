@@ -35,6 +35,13 @@ const StoreSettings: React.FC<Props> = ({ 店舗スケジュール, set店舗ス
                                 新[sIdx] = newSetting;
                                 set店舗スケジュール(新);
                             }}
+                            onApplyToAll={() => {
+                                const 新 = 店舗スケジュール.map(item => ({
+                                    ...item,
+                                    営業時間帯: JSON.parse(JSON.stringify(s.営業時間帯))
+                                }));
+                                set店舗スケジュール(新);
+                            }}
                         />
                     ))}
                 </View>
