@@ -5,6 +5,7 @@ import { Plus, Copy } from 'lucide-react-native';
 import { 曜日設定, 時間範囲 } from '../../../logic/types';
 import TimeInputGroup from './TimeInputGroup';
 import CountInputGroup from './CountInputGroup';
+import TimeRangeBar from './TimeRangeBar';
 
 interface Props {
     setting: 曜日設定;
@@ -82,6 +83,15 @@ const DaySettingRow: React.FC<Props> = ({ setting, onUpdate, onApplyToAll }) => 
                 )}
             </View>
 
+            {/* タイムバーの追加 */}
+            <View style={styles.visualization}>
+                <TimeRangeBar
+                    slots={setting.営業時間帯}
+                    inactive={setting.定休日}
+                    color="#43a047"
+                />
+            </View>
+
             {!setting.定休日 ? (
                 <View style={styles.slotsContainer}>
                     {setting.営業時間帯.map((slot, sIdx) => (
@@ -120,7 +130,6 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         borderWidth: 2,
         borderColor: '#f0f4f0',
-        gap: 12,
         marginBottom: 12,
     },
     rowClosed: {
@@ -132,7 +141,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 4,
+        marginBottom: 8,
         flexWrap: 'wrap',
         gap: 12,
     },
@@ -145,10 +154,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        backgroundColor: '#f8fafc',
+        backgroundColor: '#f8faf9',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#e2e8f0',
     },
     statusText: {
         fontSize: 10,
@@ -163,9 +174,17 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     dayLabel: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: '900',
         color: '#1e293b',
+    },
+    visualization: {
+        marginBottom: 12,
+        backgroundColor: '#fff',
+        padding: 8,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
     },
     addSlotBtn: {
         flexDirection: 'row',
@@ -174,7 +193,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#f0f4f0',
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 8,
+        borderRadius: 6,
     },
     addSlotText: {
         fontSize: 12,
@@ -188,7 +207,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#e8f5e9',
         paddingHorizontal: 8,
         paddingVertical: 4,
-        borderRadius: 8,
+        borderRadius: 6,
         borderWidth: 1,
         borderColor: '#c8e6c9',
     },
@@ -202,7 +221,7 @@ const styles = StyleSheet.create({
     },
     slotBox: {
         gap: 8,
-        paddingTop: 8,
+        paddingTop: 12,
         borderTopWidth: 1,
         borderTopColor: '#f1f5f9',
     },

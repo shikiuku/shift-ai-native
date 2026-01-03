@@ -4,6 +4,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Switch } from 'react-native';
 import { Copy, Plus } from 'lucide-react-native';
 import { スタッフ勤務設定, 時間範囲 } from '../../../logic/types';
 import TimeInputGroup from '../../StoreSettings/components/TimeInputGroup';
+import TimeRangeBar from '../../StoreSettings/components/TimeRangeBar';
 
 interface Props {
     schedule: スタッフ勤務設定[];
@@ -25,7 +26,7 @@ const StaffScheduleGrid: React.FC<Props> = ({
     return (
         <View style={styles.container}>
             {schedule.map((config, cIdx) => (
-                <View key={config.曜日} style={[styles.dayRow, !config.出勤可能 && styles.dayRowOff]}>
+                <View key={config.曜日} style={[styles.dayRow, !config.出勤 가능 && styles.dayRowOff]}>
                     <View style={styles.rowHeader}>
                         <View style={styles.dayInfo}>
                             <Text style={styles.dayText}>{config.曜日}</Text>
@@ -49,6 +50,15 @@ const StaffScheduleGrid: React.FC<Props> = ({
                                 </TouchableOpacity>
                             </View>
                         )}
+                    </View>
+
+                    {/* タイムバーの追加 */}
+                    <View style={styles.visualization}>
+                        <TimeRangeBar
+                            slots={config.可能時間帯}
+                            inactive={!config.出勤可能}
+                            color="#2196F3"
+                        />
                     </View>
 
                     {config.出勤可能 && (
@@ -82,21 +92,22 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     dayRow: {
-        backgroundColor: '#f8fafc',
-        borderRadius: 12,
+        backgroundColor: '#fff',
+        borderRadius: 16,
         padding: 12,
         borderWidth: 1,
-        borderColor: '#e2e8f0',
-        gap: 8,
+        borderColor: '#f1f5f9',
+        gap: 4,
     },
     dayRowOff: {
-        opacity: 0.6,
-        backgroundColor: '#f1f5f9',
+        backgroundColor: '#f8fafc',
+        opacity: 0.7,
     },
     rowHeader: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginBottom: 4,
     },
     dayInfo: {
         flexDirection: 'row',
@@ -109,6 +120,9 @@ const styles = StyleSheet.create({
         color: '#1e293b',
         width: 50,
     },
+    visualization: {
+        marginVertical: 4,
+    },
     headerBtns: {
         flexDirection: 'row',
         gap: 6,
@@ -118,7 +132,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 4,
         backgroundColor: '#e8f5e9',
-        paddingHorizontal: 6,
+        paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
     },
@@ -127,17 +141,18 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 4,
         backgroundColor: '#f0f4f0',
-        paddingHorizontal: 6,
+        paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
     },
     btnText: {
-        fontSize: 9,
+        fontSize: 10,
         fontWeight: 'bold',
         color: '#2d5a27',
     },
     slotsList: {
         gap: 8,
+        marginTop: 4,
     },
     timeArea: {
         marginTop: 2,
@@ -147,7 +162,9 @@ const styles = StyleSheet.create({
         color: '#94a3b8',
         fontStyle: 'italic',
         textAlign: 'center',
-        paddingVertical: 4,
+        paddingVertical: 8,
+        backgroundColor: '#f1f5f9',
+        borderRadius: 8,
     }
 });
 
