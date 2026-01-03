@@ -51,6 +51,13 @@ const StaffList: React.FC<Props> = ({
                                 return { ...st, 勤務設定: 新 };
                             });
                         }}
+                        onUpdateAllSlots={(dayIdx, newSlots) => {
+                            updateStaff(s.id, st => {
+                                const 新 = [...st.勤務設定];
+                                新[dayIdx] = { ...新[dayIdx], 可能時間帯: newSlots };
+                                return { ...st, 勤務設定: 新 };
+                            });
+                        }}
                         onUpdateRange={(dayIdx, rangeIdx, key, val) => {
                             updateStaff(s.id, st => {
                                 const 新 = [...st.勤務設定];
@@ -96,7 +103,7 @@ const StaffList: React.FC<Props> = ({
                                 const 新 = st.勤務設定.map(item => ({
                                     ...item,
                                     出勤可能: source.出勤可能,
-                                    可能時間帯: JSON.parse(JSON.stringify(source.可能時間帯))
+                                    可能時間帯: JSON.parse(JSON.stringify(source.가능時間帯))
                                 }));
                                 return { ...st, 勤務設定: 新 };
                             });

@@ -25,6 +25,10 @@ const DaySettingRow: React.FC<Props> = ({ setting, onUpdate, onApplyToAll }) => 
         onUpdate(newSetting);
     };
 
+    const updateAllSlots = (newSlots: 時間範囲[]) => {
+        onUpdate({ ...setting, 営業時間帯: newSlots });
+    };
+
     const toggleClosed = () => {
         onUpdate({ ...setting, 定休日: !setting.定休日 });
     };
@@ -83,13 +87,14 @@ const DaySettingRow: React.FC<Props> = ({ setting, onUpdate, onApplyToAll }) => 
                 )}
             </View>
 
-            {/* タイムバーの追加 */}
             <View style={styles.visualization}>
                 <TimeRangeBar
                     slots={setting.営業時間帯}
                     inactive={setting.定休日}
+                    onUpdate={updateAllSlots}
                     color="#43a047"
                 />
+                <Text style={styles.hintText}>バーを左右にドラッグして時間を調整できます</Text>
             </View>
 
             {!setting.定休日 ? (
@@ -181,10 +186,16 @@ const styles = StyleSheet.create({
     visualization: {
         marginBottom: 12,
         backgroundColor: '#fff',
-        padding: 8,
+        padding: 12,
         borderRadius: 12,
         borderWidth: 1,
         borderColor: '#f1f5f9',
+    },
+    hintText: {
+        fontSize: 8,
+        color: '#94a3b8',
+        textAlign: 'center',
+        marginTop: 2,
     },
     addSlotBtn: {
         flexDirection: 'row',

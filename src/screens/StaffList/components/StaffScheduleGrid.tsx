@@ -9,6 +9,7 @@ import TimeRangeBar from '../../StoreSettings/components/TimeRangeBar';
 interface Props {
     schedule: スタッフ勤務設定[];
     onToggle: (index: number) => void;
+    onUpdateAllSlots: (dayIdx: number, newSlots: 時間範囲[]) => void;
     onUpdateRange: (dayIdx: number, rangeIdx: number, key: keyof 時間範囲, val: string) => void;
     onAddSlot: (dayIdx: number) => void;
     onDeleteSlot: (dayIdx: number, rangeIdx: number) => void;
@@ -18,6 +19,7 @@ interface Props {
 const StaffScheduleGrid: React.FC<Props> = ({
     schedule,
     onToggle,
+    onUpdateAllSlots,
     onUpdateRange,
     onAddSlot,
     onDeleteSlot,
@@ -26,7 +28,7 @@ const StaffScheduleGrid: React.FC<Props> = ({
     return (
         <View style={styles.container}>
             {schedule.map((config, cIdx) => (
-                <View key={config.曜日} style={[styles.dayRow, !config.出勤 가능 && styles.dayRowOff]}>
+                <View key={config.曜日} style={[styles.dayRow, !config.出勤可能 && styles.dayRowOff]}>
                     <View style={styles.rowHeader}>
                         <View style={styles.dayInfo}>
                             <Text style={styles.dayText}>{config.曜日}</Text>
@@ -52,11 +54,11 @@ const StaffScheduleGrid: React.FC<Props> = ({
                         )}
                     </View>
 
-                    {/* タイムバーの追加 */}
                     <View style={styles.visualization}>
                         <TimeRangeBar
                             slots={config.可能時間帯}
                             inactive={!config.出勤可能}
+                            onUpdate={(newSlots) => onUpdateAllSlots(cIdx, newSlots)}
                             color="#2196F3"
                         />
                     </View>
@@ -97,7 +99,6 @@ const styles = StyleSheet.create({
         padding: 12,
         borderWidth: 1,
         borderColor: '#f1f5f9',
-        gap: 4,
     },
     dayRowOff: {
         backgroundColor: '#f8fafc',
@@ -122,6 +123,7 @@ const styles = StyleSheet.create({
     },
     visualization: {
         marginVertical: 4,
+        paddingHorizontal: 4,
     },
     headerBtns: {
         flexDirection: 'row',
@@ -165,6 +167,7 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         backgroundColor: '#f1f5f9',
         borderRadius: 8,
+        marginTop: 4,
     }
 });
 
