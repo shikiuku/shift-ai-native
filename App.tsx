@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -122,7 +123,7 @@ const App: React.FC = () => {
       ]}
       onPress={() => setActiveTab(id)}
     >
-      <Icon size={isTablet ? 24 : 20} color={activeTab === id ? '#2e7d32' : '#94a3b8'} />
+      <Icon size={isTablet ? 24 : 20} color={activeTab === id ? '#cddc39' : '#b0bec5'} />
       <Text style={[
         styles.navLabel,
         activeTab === id && styles.navLabelActive,
@@ -138,7 +139,7 @@ const App: React.FC = () => {
           <View style={styles.header}>
             <View style={styles.headerLogo}>
               <View style={styles.logoIcon}>
-                <Flower size={20} color="#2e7d32" />
+                <Flower size={20} color="#37474f" />
               </View>
               <Text style={styles.headerTitle}>シフトAI</Text>
             </View>
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   generateButtonText: {
-    color: '#2e7d32',
+    color: '#37474f',
     fontWeight: '900',
     fontSize: 14,
   },
@@ -226,9 +227,7 @@ const styles = StyleSheet.create({
   },
   sidebar: {
     width: 80,
-    backgroundColor: '#f8fafc', // Light Grayish Blue
-    borderRightWidth: 1,
-    borderRightColor: '#e2e8f0',
+    backgroundColor: '#37474f', // Dark Slate Gray from image
     paddingVertical: 20,
     alignItems: 'center',
     gap: 20,
@@ -238,16 +237,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   bottomTabSafeArea: {
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#37474f',
   },
   bottomTab: {
     height: 60,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#37474f',
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#e2e8f0',
   },
   navButton: {
     alignItems: 'center',
@@ -261,18 +258,18 @@ const styles = StyleSheet.create({
     minWidth: 70,
   },
   navButtonActive: {
-    backgroundColor: '#f1f8e9', // Very light green tint
+    backgroundColor: 'rgba(255, 255, 255, 0.1)', // Subtle highlight
   },
   navLabel: {
     fontSize: 10,
-    color: '#94a3b8',
+    color: '#b0bec5', // Light blue gray
     fontWeight: 'bold',
   },
   mobileNavLabel: {
     fontSize: 9,
   },
   navLabelActive: {
-    color: '#2e7d32',
+    color: '#cddc39', // Lime green for active state
   },
 });
 
