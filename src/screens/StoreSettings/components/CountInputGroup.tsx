@@ -15,21 +15,25 @@ const CountInputGroup: React.FC<Props> = ({
     onMinChange,
     onMaxChange
 }) => {
+    const displayVal = (n: number) => (n === 0 || isNaN(n) ? '' : n.toString());
+
     return (
         <View style={styles.countInputGroup}>
             <Text style={styles.countLabel}>必要人数</Text>
             <TextInput
                 keyboardType="numeric"
-                value={minStaff.toString()}
+                value={displayVal(minStaff)}
                 onChangeText={onMinChange}
                 style={styles.countInput}
+                placeholder="0"
             />
             <Text style={styles.separator}>〜</Text>
             <TextInput
                 keyboardType="numeric"
-                value={maxStaff.toString()}
+                value={displayVal(maxStaff)}
                 onChangeText={onMaxChange}
                 style={styles.countInput}
+                placeholder="0"
             />
         </View>
     );
@@ -60,6 +64,7 @@ const styles = StyleSheet.create({
         fontWeight: '900',
         borderRadius: 6,
         paddingVertical: 2,
+        color: '#1e293b',
     },
     separator: {
         color: '#cbd5e1',
