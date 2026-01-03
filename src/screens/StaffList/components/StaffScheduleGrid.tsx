@@ -1,27 +1,56 @@
 
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { スタッフ勤務設定 } from '../../../logic/types';
+import { View, Text, TouchableOpacity, StyleSheet, Switch } from 'react-native';
+import { Copy } from 'lucide-react-native';
+import { スタッフ勤務設定, 時間範囲 } from '../../../logic/types';
+import TimeInputGroup from '../../StoreSettings/components/TimeInputGroup';
 
 interface Props {
     schedule: スタッフ勤務設定[];
     onToggle: (index: number) => void;
+    onUpdateRange: (dayIdx: number, rangeIdx: number, key: keyof 時間範囲, val: string) => void;
+    onApplyToAll: (dayIdx: number) => void;
 }
 
-const StaffScheduleGrid: React.FC<Props> = ({ schedule, onToggle }) => {
+const StaffScheduleGrid: React.FC<Props> = ({ schedule, onToggle, onUpdateRange, onApplyToAll }) => {
     return (
-        <View style={styles.scheduleGrid}>
+        <View style={styles.container}>
             {schedule.map((config, cIdx) => (
-                <View key={config.曜日} style={styles.scheduleRow}>
-                    <Text style={styles.dayText}>{config.曜日.slice(0, 1)}</Text>
-                    <TouchableOpacity
-                        style={[styles.toggle, config.出勤可能 ? styles.toggleOn : styles.toggleOff]}
-                        onPress={() => onToggle(cIdx)}
-                    >
-                        <Text style={[styles.toggleText, config.出勤可能 && styles.toggleTextOn]}>
-                            {config.出勤可能 ? '可' : '不可'}
-                        </Text>
-                    </TouchableOpacity>
+                <View key={config.曜日} style={[styles.dayRow, !config.出勤可能 && styles.dayRowOff]}>
+                    <View style={styles.rowHeader}>
+                        <View style={styles.dayInfo}>
+                            <Text style={styles.dayText}>{config.曜日}</Text>
+                            <Switch
+                                value={config.出勤可能}
+                                onValueChange={() => onToggle(cIdx)}
+                                trackColor={{ false: '#cbd5e1', true: '#cddc39' }}
+                                thumbColor={config.出勤可能 ? '#2d5a27' : '#f4f3f4'}
+                                ios_backgroundColor="#cbd5e1"
+                            />
+                        </View>
+                        {config.出勤可能 && (
+                            <TouchableOpacity style={styles.copyBtn} onPress={() => onApplyToAll(cIdx)}>
+                                <Copy size={14} color="#2d5a27" />
+                                <Text style={styles.copyText}>全曜日に適用</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
+
+                    {config.出勤可能 && config.可能時間帯.map((range, rIdx) => (
+                        <View key={rIdx} style={styles.timeArea}>
+                            <TimeInputGroup
+                                startTime={range.開始}
+                                endTime={range.終了}
+                                onStartTimeChange={(val) => onUpdateRange(cIdx, rIdx, '開始', val)}
+                                onEndTimeChange={(val) => onUpdateRange(cIdx, rIdx, '終了', val)}
+                                showDelete={false}
+                            />
+                        </View>
+                    ))}
+
+                    {!config.出勤可能 && (
+                        <Text style={styles.offText}>この曜日はお休みです</Text>
+                    )}
                 </View>
             ))}
         </View>
@@ -29,44 +58,61 @@ const StaffScheduleGrid: React.FC<Props> = ({ schedule, onToggle }) => {
 };
 
 const styles = StyleSheet.create({
-    scheduleGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
+    container: {
+        gap: 12,
+    },
+    dayRow: {
+        backgroundColor: '#f8fafc',
+        borderRadius: 12,
+        padding: 12,
+        borderWidth: 1,
+        borderColor: '#e2e8f0',
         gap: 8,
     },
-    scheduleRow: {
+    dayRowOff: {
+        opacity: 0.6,
+        backgroundColor: '#f1f5f9',
+    },
+    rowHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        gap: 4,
+    },
+    dayInfo: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
     },
     dayText: {
-        fontSize: 10,
+        fontSize: 14,
         fontWeight: 'bold',
-        color: '#64748b',
+        color: '#1e293b',
+        width: 60,
     },
-    toggle: {
-        width: 32,
-        height: 32,
-        borderRadius: 8,
-        justifyContent: 'center',
+    copyBtn: {
+        flexDirection: 'row',
         alignItems: 'center',
-        borderWidth: 1,
+        gap: 4,
+        backgroundColor: '#e8f5e9',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
     },
-    toggleOn: {
-        backgroundColor: '#2d5a27',
-        borderColor: '#2d5a27',
-    },
-    toggleOff: {
-        backgroundColor: '#f8fafc',
-        borderColor: '#e2e8f0',
-    },
-    toggleText: {
+    copyText: {
         fontSize: 10,
         fontWeight: 'bold',
-        color: '#cbd5e1',
+        color: '#2d5a27',
     },
-    toggleTextOn: {
-        color: '#fff',
+    timeArea: {
+        marginTop: 4,
     },
+    offText: {
+        fontSize: 11,
+        color: '#94a3b8',
+        fontStyle: 'italic',
+        textAlign: 'center',
+        paddingVertical: 4,
+    }
 });
 
 export default StaffScheduleGrid;

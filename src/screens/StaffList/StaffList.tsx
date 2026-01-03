@@ -1,17 +1,8 @@
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
-import { UserPlus, ChevronRight, ChevronDown, Trash2 } from 'lucide-react-native';
-import { スタッフ, 役割, 曜日一覧 } from '../../logic/types';
-
-interface Props {
-    全スタッフ: スタッフ[];
-    set全スタッフ: (s: スタッフ[]) => void;
-    展開中のスタッフID: string | null;
-    set展開中のスタッフID: (id: string | null) => void;
-    スタッフ追加: () => void;
-}
-
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { UserPlus } from 'lucide-react-native';
+import { スタッフ, 時間範囲 } from '../../logic/types';
 import StaffCard from './components/StaffCard';
 
 interface Props {
@@ -29,13 +20,17 @@ const StaffList: React.FC<Props> = ({
     set展開中のスタッフID,
     スタッフ追加
 }) => {
+    const updateStaff = (id: string, updater: (s: スタッフ) => スタッフ) => {
+        set全スタッフ(全スタッフ.map(s => s.id === id ? updater(s) : s));
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.title}>スタッフ設定 ({全スタッフ.length}名)</Text>
                 <TouchableOpacity style={styles.addButton} onPress={スタッフ追加}>
                     <UserPlus size={20} color="#fff" />
-                    <Text style={styles.addButtonText}>追加</Text>
+                    <Text style={styles.addButtonText}>スタッフ追加</Text>
                 </TouchableOpacity>
             </View>
 
@@ -47,13 +42,37 @@ const StaffList: React.FC<Props> = ({
                         isExpanded={展開中のスタッフID === s.id}
                         onToggleExpand={() => set展開中のスタッフID(展開中のスタッフID === s.id ? null : s.id)}
                         onUpdateName={(name) => {
-                            set全スタッフ(全スタッフ.map(st => st.id === s.id ? { ...st, 名前: name } : st));
+                            updateStaff(s.id, st => ({ ...st, 名前: name }));
                         }}
                         onToggleDay={(dayIdx) => {
-                            const 新 = [...全スタッフ];
-                            const stIdx = 新.findIndex(st => st.id === s.id);
-                            新[stIdx].勤務設定[dayIdx].出勤可能 = !新[stIdx].勤務設定[dayIdx].出勤可能;
-                            set全スタッフ(新);
+                            updateStaff(s.id, st => {
+                                const 新 = [...st.勤務設定];
+                                新[dayIdx] = { ...新[dayIdx], 出勤可能: !新[dayIdx].出勤可能 };
+                                return { ...st, 勤務設定: 新 };
+                            });
+                        }}
+                        onUpdateRange={(dayIdx, rangeIdx, key, val) => {
+                            updateStaff(s.id, st => {
+                                const 新 = [...st.勤務設定];
+                                const range新 = [...新[dayIdx].可能時間帯];
+                                range新[rangeIdx] = {
+                                    ...range新[rangeIdx],
+                                    [key]: val === '' ? 0 : parseInt(val) || 0
+                                };
+                                新[dayIdx] = { ...新[dayIdx], 可能時間帯: range新 };
+                                return { ...st, 勤務設定: 新 };
+                            });
+                        }}
+                        onApplyToAll={(dayIdx) => {
+                            updateStaff(s.id, st => {
+                                const source = st.勤務設定[dayIdx];
+                                const 新 = st.勤務設定.map(item => ({
+                                    ...item,
+                                    出勤可能: source.出勤可能,
+                                    可能時間帯: JSON.parse(JSON.stringify(source.可能時間帯))
+                                }));
+                                return { ...st, 勤務設定: 新 };
+                            });
                         }}
                         onDelete={() => {
                             set全スタッフ(全スタッフ.filter(item => item.id !== s.id));
@@ -98,129 +117,6 @@ const styles = StyleSheet.create({
     list: {
         padding: 16,
         gap: 12,
-    },
-    card: {
-        backgroundColor: '#fff',
-        borderRadius: 16,
-        borderWidth: 1,
-        borderColor: '#f0f4f0',
-        overflow: 'hidden',
-    },
-    cardExpanded: {
-        borderColor: '#cddc39',
-    },
-    cardHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: 16,
-    },
-    userInfo: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-    },
-    avatar: {
-        width: 40,
-        height: 40,
-        borderRadius: 10,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    avatarText: {
-        color: '#fff',
-        fontWeight: '900',
-        fontSize: 18,
-    },
-    userName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#1e293b',
-    },
-    userRole: {
-        fontSize: 10,
-        fontWeight: 'bold',
-        color: '#94a3b8',
-        textTransform: 'uppercase',
-    },
-    details: {
-        padding: 16,
-        borderTopWidth: 1,
-        borderTopColor: '#f8fafc',
-        gap: 16,
-    },
-    inputGroup: {
-        gap: 6,
-    },
-    label: {
-        fontSize: 10,
-        fontWeight: '900',
-        color: '#94a3b8',
-        textTransform: 'uppercase',
-    },
-    input: {
-        backgroundColor: '#fff',
-        borderWidth: 2,
-        borderColor: '#f0f4f0',
-        borderRadius: 12,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        fontWeight: 'bold',
-    },
-    subTitle: {
-        color: '#2d5a27',
-        fontWeight: '900',
-        fontSize: 14,
-    },
-    scheduleGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 8,
-    },
-    scheduleRow: {
-        alignItems: 'center',
-        gap: 4,
-    },
-    dayText: {
-        fontSize: 10,
-        fontWeight: 'bold',
-        color: '#64748b',
-    },
-    toggle: {
-        width: 32,
-        height: 32,
-        borderRadius: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderWidth: 1,
-    },
-    toggleOn: {
-        backgroundColor: '#2d5a27',
-        borderColor: '#2d5a27',
-    },
-    toggleOff: {
-        backgroundColor: '#f8fafc',
-        borderColor: '#e2e8f0',
-    },
-    toggleText: {
-        fontSize: 10,
-        fontWeight: 'bold',
-        color: '#cbd5e1',
-    },
-    toggleTextOn: {
-        color: '#fff',
-    },
-    deleteButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 6,
-        marginTop: 8,
-    },
-    deleteButtonText: {
-        color: '#f87171',
-        fontWeight: 'bold',
-        fontSize: 12,
     },
 });
 

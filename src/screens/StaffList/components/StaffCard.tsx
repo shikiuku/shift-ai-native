@@ -2,15 +2,17 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
 import { ChevronRight, ChevronDown, Trash2 } from 'lucide-react-native';
-import { スタッフ } from '../../../logic/types';
+import { スタッフ, 時間範囲 } from '../../../logic/types';
 import StaffScheduleGrid from './StaffScheduleGrid';
 
 interface Props {
     staff: スタッフ;
     isExpanded: boolean;
     onToggleExpand: () => void;
-    onUpdateName: (name: string) => void;
+    onUpdateName: (name) => void;
     onToggleDay: (dayIdx: number) => void;
+    onUpdateRange: (dayIdx: number, rangeIdx: number, key: keyof 時間範囲, val: string) => void;
+    onApplyToAll: (dayIdx: number) => void;
     onDelete: () => void;
 }
 
@@ -20,6 +22,8 @@ const StaffCard: React.FC<Props> = ({
     onToggleExpand,
     onUpdateName,
     onToggleDay,
+    onUpdateRange,
+    onApplyToAll,
     onDelete,
 }) => {
     return (
@@ -55,6 +59,8 @@ const StaffCard: React.FC<Props> = ({
                     <StaffScheduleGrid
                         schedule={staff.勤務設定}
                         onToggle={onToggleDay}
+                        onUpdateRange={onUpdateRange}
+                        onApplyToAll={onApplyToAll}
                     />
 
                     <TouchableOpacity
@@ -62,7 +68,7 @@ const StaffCard: React.FC<Props> = ({
                         onPress={onDelete}
                     >
                         <Trash2 size={16} color="#f87171" />
-                        <Text style={styles.deleteButtonText}>削除</Text>
+                        <Text style={styles.deleteButtonText}>スタッフを削除</Text>
                     </TouchableOpacity>
                 </View>
             )}
@@ -80,6 +86,7 @@ const styles = StyleSheet.create({
     },
     cardExpanded: {
         borderColor: '#cddc39',
+        borderWidth: 2,
     },
     cardHeader: {
         flexDirection: 'row',
@@ -149,7 +156,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
-        marginTop: 8,
+        marginTop: 16,
+        paddingVertical: 12,
+        backgroundColor: '#fff5f5',
+        borderRadius: 12,
     },
     deleteButtonText: {
         color: '#f87171',
