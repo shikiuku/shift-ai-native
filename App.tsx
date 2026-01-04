@@ -1,4 +1,4 @@
-
+import './global.css';
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -114,44 +114,48 @@ const App: React.FC = () => {
     }
   };
 
-  const NavButton = ({ id, icon: Icon, label }: { id: typeof activeTab, icon: any, label: string }) => (
-    <TouchableOpacity
-      style={[
-        styles.navButton,
-        activeTab === id && styles.navButtonActive,
-        !isTablet && styles.mobileNavButton
-      ]}
-      onPress={() => setActiveTab(id)}
-    >
-      <Icon size={isTablet ? 24 : 20} color={activeTab === id ? '#cddc39' : '#b0bec5'} />
-      <Text style={[
-        styles.navLabel,
-        activeTab === id && styles.navLabelActive,
-        !isTablet && styles.mobileNavLabel
-      ]}>{label}</Text>
-    </TouchableOpacity>
-  );
+  const NavButton = ({ id, icon: Icon, label }: { id: typeof activeTab, icon: any, label: string }) => {
+    const isActive = activeTab === id;
+    return (
+      <TouchableOpacity
+        className={`items-center gap-1 p-2 rounded-xl min-w-[60px] ${isActive ? 'bg-white/10' : ''
+          } ${!isTablet ? 'py-1.5 min-w-[70px]' : ''}`}
+        onPress={() => setActiveTab(id)}
+      >
+        <Icon size={isTablet ? 24 : 20} color={isActive ? '#cddc39' : '#b0bec5'} />
+        <Text
+          className={`text-[10px] font-bold ${isActive ? 'text-[#cddc39]' : 'text-[#b0bec5]'
+            } ${!isTablet ? 'text-[9px]' : ''}`}
+        >
+          {label}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaProvider>
-      <View style={styles.container}>
-        <SafeAreaView style={styles.headerSafeArea}>
-          <View style={styles.header}>
-            <View style={styles.headerLogo}>
-              <View style={styles.logoIcon}>
+      <View className="flex-1 bg-slate-50">
+        <SafeAreaView className="bg-green-600">
+          <View className="h-[60px] bg-green-600 flex-row items-center justify-between px-4">
+            <View className="flex-row items-center gap-2">
+              <View className="bg-lime-300 p-1 rounded-lg">
                 <Flower size={20} color="#37474f" />
               </View>
-              <Text style={styles.headerTitle}>シフトAI</Text>
+              <Text className="text-white text-xl font-black">シフトAI</Text>
             </View>
-            <TouchableOpacity style={styles.generateButton} onPress={シフト生成実行}>
-              <Text style={styles.generateButtonText}>AI生成</Text>
+            <TouchableOpacity
+              className="bg-lime-300 px-4 py-2 rounded-xl active:opacity-80"
+              onPress={シフト生成実行}
+            >
+              <Text className="text-[#37474f] font-black text-sm">AI生成</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
 
-        <View style={styles.mainLayout}>
+        <View className="flex-1 flex-row">
           {isTablet && (
-            <View style={styles.sidebar}>
+            <View className="w-20 bg-[#37474f] py-5 items-center gap-5">
               <NavButton id="Store" icon={Store} label="設定" />
               <NavButton id="Staff" icon={Users} label="名簿" />
               <NavButton id="Rules" icon={ArrowRightLeft} label="相性" />
@@ -159,14 +163,14 @@ const App: React.FC = () => {
             </View>
           )}
 
-          <View style={styles.content}>
+          <View className="flex-1 bg-white">
             {renderContent()}
           </View>
         </View>
 
         {!isTablet && (
-          <SafeAreaView style={styles.bottomTabSafeArea}>
-            <View style={styles.bottomTab}>
+          <SafeAreaView className="bg-[#37474f]">
+            <View className="h-[60px] bg-[#37474f] flex-row justify-around items-center px-2">
               <NavButton id="Store" icon={Store} label="設定" />
               <NavButton id="Staff" icon={Users} label="名簿" />
               <NavButton id="Rules" icon={ArrowRightLeft} label="相性" />
@@ -182,94 +186,6 @@ const App: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  headerSafeArea: {
-    backgroundColor: '#43a047',
-  },
-  header: {
-    height: 60,
-    backgroundColor: '#43a047',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-  },
-  headerLogo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  logoIcon: {
-    backgroundColor: '#dce775',
-    padding: 4,
-    borderRadius: 8,
-  },
-  headerTitle: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: '900',
-  },
-  generateButton: {
-    backgroundColor: '#dce775',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 12,
-  },
-  generateButtonText: {
-    color: '#37474f',
-    fontWeight: '900',
-    fontSize: 14,
-  },
-  mainLayout: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  sidebar: {
-    width: 80,
-    backgroundColor: '#37474f', // Dark Slate Gray from image
-    paddingVertical: 20,
-    alignItems: 'center',
-    gap: 20,
-  },
-  content: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  bottomTabSafeArea: {
-    backgroundColor: '#37474f',
-  },
-  bottomTab: {
-    height: 60,
-    backgroundColor: '#37474f',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  navButton: {
-    alignItems: 'center',
-    gap: 4,
-    padding: 8,
-    borderRadius: 12,
-    minWidth: 60,
-  },
-  mobileNavButton: {
-    paddingVertical: 6,
-    minWidth: 70,
-  },
-  navButtonActive: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)', // Subtle highlight
-  },
-  navLabel: {
-    fontSize: 10,
-    color: '#b0bec5', // Light blue gray
-    fontWeight: 'bold',
-  },
-  mobileNavLabel: {
-    fontSize: 9,
-  },
-  navLabelActive: {
-    color: '#cddc39', // Lime green for active state
   },
 });
 

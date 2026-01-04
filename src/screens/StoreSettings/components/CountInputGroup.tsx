@@ -22,74 +22,30 @@ const CountInputGroup: React.FC<Props> = ({
     };
 
     return (
-        <View style={styles.countInputGroup}>
-            <Text style={styles.countLabel}>必要人数</Text>
-            <View style={styles.inputsRow}>
+        <View className="flex-col bg-white border-2 border-[#f0f4f0] p-2.5 rounded-xl gap-1.5">
+            <Text className="text-[10px] font-black text-slate-400 uppercase">必要人数</Text>
+            <View className="flex-row items-center gap-2">
                 <TextInput
                     keyboardType="numeric"
                     value={displayVal(minStaff)}
                     onChangeText={onMinChange}
-                    style={styles.countInput}
+                    className="bg-slate-50 w-[60px] text-center font-black rounded-lg py-1.5 text-slate-800 text-base border border-slate-200"
                     placeholder="0"
                     placeholderTextColor="#cbd5e1"
                 />
-                <Text style={styles.separator}>〜</Text>
+                <Text className="text-slate-300 font-bold">〜</Text>
                 <TextInput
                     keyboardType="numeric"
                     value={displayVal(maxStaff)}
                     onChangeText={onMaxChange}
-                    style={styles.countInput}
+                    className="bg-slate-50 w-[60px] text-center font-black rounded-lg py-1.5 text-slate-800 text-base border border-slate-200"
                     placeholder="0"
                     placeholderTextColor="#cbd5e1"
                 />
-                <Text style={styles.unitText}>人</Text>
+                <Text className="text-xs text-slate-400 font-bold">人</Text>
             </View>
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    countInputGroup: {
-        flexDirection: 'column',
-        backgroundColor: '#fff',
-        borderWidth: 2,
-        borderColor: '#f0f4f0',
-        padding: 10,
-        borderRadius: 12,
-        gap: 6,
-    },
-    countLabel: {
-        fontSize: 10,
-        fontWeight: '900',
-        color: '#94a3b8',
-        textTransform: 'uppercase',
-    },
-    inputsRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-    },
-    countInput: {
-        backgroundColor: '#f8fafc',
-        width: 60,
-        textAlign: 'center',
-        fontWeight: '900',
-        borderRadius: 8,
-        paddingVertical: 6,
-        color: '#1e293b',
-        fontSize: 16,
-        borderWidth: 1,
-        borderColor: '#e2e8f0',
-    },
-    separator: {
-        color: '#cbd5e1',
-        fontWeight: 'bold',
-    },
-    unitText: {
-        fontSize: 12,
-        color: '#94a3b8',
-        fontWeight: 'bold',
-    }
-});
 
 export default CountInputGroup;

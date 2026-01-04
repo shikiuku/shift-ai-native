@@ -5,7 +5,7 @@ import { Plus, Copy } from 'lucide-react-native';
 import { 曜日設定, 時間範囲 } from '../../../logic/types';
 import TimeInputGroup from './TimeInputGroup';
 import CountInputGroup from './CountInputGroup';
-import TimeRangeBar from './TimeRangeBar';
+
 
 interface Props {
     setting: 曜日設定;
@@ -55,12 +55,12 @@ const DaySettingRow: React.FC<Props> = ({ setting, onUpdate, onApplyToAll }) => 
     };
 
     return (
-        <View style={[styles.row, setting.定休日 && styles.rowClosed]}>
-            <View style={styles.rowHeader}>
-                <View style={styles.titleArea}>
-                    <Text style={styles.dayLabel}>{setting.曜日}</Text>
-                    <View style={styles.statusArea}>
-                        <Text style={[styles.statusText, setting.定休日 && styles.statusTextClosed]}>
+        <View className={`p-4 bg-white rounded-2xl border-2 border-[#f0f4f0] mb-3 ${setting.定休日 ? 'bg-slate-50 border-slate-100 opacity-80' : ''}`}>
+            <View className="flex-row justify-between items-center mb-2 flex-wrap gap-3">
+                <View className="flex-row items-center gap-3">
+                    <Text className="text-lg font-black text-slate-800">{setting.曜日}</Text>
+                    <View className="flex-row items-center gap-2 bg-[#f8faf9] px-2 py-1 rounded-full border border-slate-200">
+                        <Text className={`text-[10px] font-bold ${setting.定休日 ? 'text-slate-400' : 'text-[#2d5a27]'}`}>
                             {setting.定休日 ? '定休日' : '営業日'}
                         </Text>
                         <Switch
@@ -74,33 +74,25 @@ const DaySettingRow: React.FC<Props> = ({ setting, onUpdate, onApplyToAll }) => 
                 </View>
 
                 {!setting.定休日 && (
-                    <View style={styles.headerBtns}>
-                        <TouchableOpacity onPress={onApplyToAll} style={styles.applyAllBtn}>
+                    <View className="flex-row gap-2">
+                        <TouchableOpacity onPress={onApplyToAll} className="flex-row items-center gap-1 bg-[#e8f5e9] px-2 py-1 rounded-md border border-[#c8e6c9]">
                             <Copy size={14} color="#2d5a27" />
-                            <Text style={styles.applyAllText}>全曜日に適用</Text>
+                            <Text className="text-[10px] font-bold text-[#2d5a27]">全曜日に適用</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity onPress={addSlot} style={styles.addSlotBtn}>
+                        <TouchableOpacity onPress={addSlot} className="flex-row items-center gap-1 bg-[#f0f4f0] px-2 py-1 rounded-md">
                             <Plus size={16} color="#2d5a27" />
-                            <Text style={styles.addSlotText}>追加</Text>
+                            <Text className="text-xs font-bold text-[#2d5a27]">追加</Text>
                         </TouchableOpacity>
                     </View>
                 )}
             </View>
 
-            <View style={styles.visualization}>
-                <TimeRangeBar
-                    slots={setting.営業時間帯}
-                    inactive={setting.定休日}
-                    onUpdate={updateAllSlots}
-                    color="#43a047"
-                />
-                <Text style={styles.hintText}>バーを左右にドラッグして時間を調整できます</Text>
-            </View>
+
 
             {!setting.定休日 ? (
-                <View style={styles.slotsContainer}>
+                <View className="gap-3">
                     {setting.営業時間帯.map((slot, sIdx) => (
-                        <View key={sIdx} style={styles.slotBox}>
+                        <View key={sIdx} className="gap-2 pt-3 border-t border-slate-100">
                             <TimeInputGroup
                                 startTime={slot.開始}
                                 endTime={slot.終了}
@@ -120,133 +112,12 @@ const DaySettingRow: React.FC<Props> = ({ setting, onUpdate, onApplyToAll }) => 
                     ))}
                 </View>
             ) : (
-                <View style={styles.closedInfo}>
-                    <Text style={styles.closedInfoText}>この曜日はシフトを生成しません</Text>
+                <View className="p-3 bg-slate-100 rounded-xl items-center">
+                    <Text className="text-xs text-slate-500 font-bold">この曜日はシフトを生成しません</Text>
                 </View>
             )}
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    row: {
-        padding: 16,
-        backgroundColor: '#fff',
-        borderRadius: 16,
-        borderWidth: 2,
-        borderColor: '#f0f4f0',
-        marginBottom: 12,
-    },
-    rowClosed: {
-        backgroundColor: '#f8fafc',
-        borderColor: '#f1f5f9',
-        opacity: 0.8,
-    },
-    rowHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 8,
-        flexWrap: 'wrap',
-        gap: 12,
-    },
-    titleArea: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-    },
-    statusArea: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        backgroundColor: '#f8faf9',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderColor: '#e2e8f0',
-    },
-    statusText: {
-        fontSize: 10,
-        fontWeight: 'bold',
-        color: '#2d5a27',
-    },
-    statusTextClosed: {
-        color: '#94a3b8',
-    },
-    headerBtns: {
-        flexDirection: 'row',
-        gap: 8,
-    },
-    dayLabel: {
-        fontSize: 18,
-        fontWeight: '900',
-        color: '#1e293b',
-    },
-    visualization: {
-        marginBottom: 12,
-        backgroundColor: '#fff',
-        padding: 12,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: '#f1f5f9',
-    },
-    hintText: {
-        fontSize: 8,
-        color: '#94a3b8',
-        textAlign: 'center',
-        marginTop: 2,
-    },
-    addSlotBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-        backgroundColor: '#f0f4f0',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
-    },
-    addSlotText: {
-        fontSize: 12,
-        fontWeight: 'bold',
-        color: '#2d5a27',
-    },
-    applyAllBtn: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-        backgroundColor: '#e8f5e9',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
-        borderWidth: 1,
-        borderColor: '#c8e6c9',
-    },
-    applyAllText: {
-        fontSize: 10,
-        fontWeight: 'bold',
-        color: '#2d5a27',
-    },
-    slotsContainer: {
-        gap: 12,
-    },
-    slotBox: {
-        gap: 8,
-        paddingTop: 12,
-        borderTopWidth: 1,
-        borderTopColor: '#f1f5f9',
-    },
-    closedInfo: {
-        padding: 12,
-        backgroundColor: '#f1f5f9',
-        borderRadius: 12,
-        alignItems: 'center',
-    },
-    closedInfoText: {
-        fontSize: 12,
-        color: '#64748b',
-        fontWeight: 'bold',
-    }
-});
 
 export default DaySettingRow;

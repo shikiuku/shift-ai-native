@@ -3,6 +3,8 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
 import { CalendarDays, Users2, Printer } from 'lucide-react-native';
 import { 週間スケジュール, スタッフ, 曜日一覧, 時間ラベル } from '../../logic/types';
+import ShiftTableDayView from './components/ShiftTableDayView';
+import ShiftTableWeekVerticalView from './components/ShiftTableWeekVerticalView';
 
 interface Props {
     スケジュール: 週間スケジュール | null;
@@ -11,6 +13,11 @@ interface Props {
 }
 
 const ShiftTable: React.FC<Props> = ({ スケジュール, 全スタッフ, スタッフ総時間 }) => {
+    // 表示モードの状態管理
+    const [periodMode, setPeriodMode] = React.useState<'day' | 'week' | 'month'>('week');
+    const [axisMode, setAxisMode] = React.useState<'staff' | 'time'>('staff');
+    const [currentDate, setCurrentDate] = React.useState(new Date());
+
     if (!スケジュール) {
         return (
             <View style={styles.emptyContainer}>
@@ -22,6 +29,32 @@ const ShiftTable: React.FC<Props> = ({ スケジュール, 全スタッフ, ス�
 
     return (
         <View style={styles.container}>
+            {/* Control Header */}
+            <View style={styles.controlHeader}>
+                <View style={styles.segmentedControl}>
+                    <Text
+                        style={[styles.segmentBtn, periodMode === 'day' && styles.segmentBtnActive]}
+                        onPress={() => setPeriodMode('day')}>日</Text>
+                    <Text
+                        style={[styles.segmentBtn, periodMode === 'week' && styles.segmentBtnActive]}
+                        onPress={() => setPeriodMode('week')}>週</Text>
+                    <Text
+                        style={[styles.segmentBtn, periodMode === 'month' && styles.segmentBtnActive]}
+                        onPress={() => setPeriodMode('month')}>月</Text>
+                </View>
+
+                {(periodMode === 'day' || periodMode === 'week') && (
+                    <View style={styles.segmentedControl}>
+                        <Text
+                            style={[styles.segmentBtn, axisMode === 'staff' && styles.segmentBtnActive]}
+                            onPress={() => setAxisMode('staff')}>人</Text>
+                        <Text
+                            style={[styles.segmentBtn, axisMode === 'time' && styles.segmentBtnActive]}
+                            onPress={() => setAxisMode('time')}>時</Text>
+                    </View>
+                )}
+            </View>
+
             <View style={styles.header}>
                 <View style={styles.statsContainer}>
                     <View style={styles.statBadge}>
@@ -32,48 +65,68 @@ const ShiftTable: React.FC<Props> = ({ スケジュール, 全スタッフ, ス�
                 <Printer size={20} color="#cbd5e1" />
             </View>
 
-            <ScrollView horizontal bounces={false} style={styles.tableScroll}>
-                <View>
-                    <View style={styles.tableHeader}>
-                        <View style={styles.staffColumnHeader}>
-                            <Text style={styles.headerText}>スタッフ</Text>
-                        </View>
-                        {曜日一覧.map(曜日 => (
-                            <View key={曜日} style={styles.dayColumnHeader}>
-                                <Text style={styles.headerText}>{曜日}</Text>
-                            </View>
-                        ))}
-                    </View>
-
-                    <ScrollView style={styles.tableBody} bounces={false}>
-                        {全スタッフ.map(s => (
-                            <View key={s.id} style={styles.tableRow}>
-                                <View style={styles.staffCell}>
-                                    <View style={[styles.miniAvatar, { backgroundColor: s.色 }]}>
-                                        <Text style={styles.miniAvatarText}>{s.名前[0]}</Text>
-                                    </View>
-                                    <Text style={styles.staffNameText} numberOfLines={1}>{s.名前}</Text>
+            {periodMode === 'week' ? (
+                axisMode === 'time' ? (
+                    <ShiftTableWeekVerticalView
+                        schedule={スケジュール}
+                        staffList={全スタッフ}
+                    />
+                ) : (
+                    // 既存の週間ビュー (Staff Axis)
+                    <ScrollView horizontal bounces={false} style={styles.tableScroll}>
+                        <View>
+                            <View style={styles.tableHeader}>
+                                <View style={styles.staffColumnHeader}>
+                                    <Text style={styles.headerText}>スタッフ</Text>
                                 </View>
-                                {曜日一覧.map(曜日 => {
-                                    const 今日のシフト = スケジュール.シフトリスト.filter(枠 => 枠.曜日 === 曜日 && 枠.担当者IDリスト.includes(s.id));
-                                    return (
-                                        <View key={曜日} style={styles.dayCell}>
-                                            {今日のシフト.map((枠, idx) => (
-                                                <View key={idx} style={styles.shiftBadge}>
-                                                    <View style={[styles.dot, { backgroundColor: s.色 }]} />
-                                                    <Text style={styles.shiftTimeText}>
-                                                        {時間ラベル(枠.開始時間)}-{時間ラベル(枠.終了時間)}
-                                                    </Text>
-                                                </View>
-                                            ))}
-                                        </View>
-                                    );
-                                })}
+                                {曜日一覧.map(曜日 => (
+                                    <View key={曜日} style={styles.dayColumnHeader}>
+                                        <Text style={styles.headerText}>{曜日}</Text>
+                                    </View>
+                                ))}
                             </View>
-                        ))}
+
+                            <ScrollView style={styles.tableBody} bounces={false}>
+                                {全スタッフ.map(s => (
+                                    <View key={s.id} style={styles.tableRow}>
+                                        <View style={styles.staffCell}>
+                                            <View style={[styles.miniAvatar, { backgroundColor: s.色 }]}>
+                                                <Text style={styles.miniAvatarText}>{s.名前[0]}</Text>
+                                            </View>
+                                            <Text style={styles.staffNameText} numberOfLines={1}>{s.名前}</Text>
+                                        </View>
+                                        {曜日一覧.map(曜日 => {
+                                            const 今日のシフト = スケジュール.シフトリスト.filter(枠 => 枠.曜日 === 曜日 && 枠.担当者IDリスト.includes(s.id));
+                                            return (
+                                                <View key={曜日} style={styles.dayCell}>
+                                                    {今日のシフト.map((枠, idx) => (
+                                                        <View key={idx} style={styles.shiftBadge}>
+                                                            <View style={[styles.dot, { backgroundColor: s.色 }]} />
+                                                            <Text style={styles.shiftTimeText}>
+                                                                {時間ラベル(枠.開始時間)}-{時間ラベル(枠.終了時間)}
+                                                            </Text>
+                                                        </View>
+                                                    ))}
+                                                </View>
+                                            );
+                                        })}
+                                    </View>
+                                ))}
+                            </ScrollView>
+                        </View>
                     </ScrollView>
+                )
+            ) : periodMode === 'day' ? (
+                <ShiftTableDayView
+                    date={currentDate}
+                    schedule={スケジュール}
+                    staffList={全スタッフ}
+                />
+            ) : (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={{ color: '#94a3b8' }}>月間表示（開発中）</Text>
                 </View>
-            </ScrollView>
+            )}
         </View>
     );
 };
@@ -221,6 +274,36 @@ const styles = StyleSheet.create({
         fontSize: 9,
         fontWeight: '900',
         color: '#2d5a27',
+    },
+    controlHeader: {
+        flexDirection: 'row',
+        padding: 12,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#f1f5f9',
+        gap: 12,
+    },
+    segmentedControl: {
+        flexDirection: 'row',
+        backgroundColor: '#f1f5f9',
+        borderRadius: 8,
+        padding: 2,
+    },
+    segmentBtn: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#64748b',
+        overflow: 'hidden',
+        borderRadius: 6,
+    },
+    segmentBtnActive: {
+        backgroundColor: '#fff',
+        color: '#2d5a27',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
     },
 });
 

@@ -4,7 +4,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Switch } from 'react-native';
 import { Copy, Plus } from 'lucide-react-native';
 import { スタッフ勤務設定, 時間範囲 } from '../../../logic/types';
 import TimeInputGroup from '../../StoreSettings/components/TimeInputGroup';
-import TimeRangeBar from '../../StoreSettings/components/TimeRangeBar';
+
 
 interface Props {
     schedule: スタッフ勤務設定[];
@@ -54,14 +54,7 @@ const StaffScheduleGrid: React.FC<Props> = ({
                         )}
                     </View>
 
-                    <View style={styles.visualization}>
-                        <TimeRangeBar
-                            slots={config.可能時間帯}
-                            inactive={!config.出勤可能}
-                            onUpdate={(newSlots) => onUpdateAllSlots(cIdx, newSlots)}
-                            color="#2196F3"
-                        />
-                    </View>
+
 
                     {config.出勤可能 && (
                         <View style={styles.slotsList}>
